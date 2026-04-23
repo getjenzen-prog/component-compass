@@ -1,4 +1,4 @@
-import { LayoutDashboard, Cpu, Truck, AlertTriangle, Sparkles } from "lucide-react";
+import { LayoutDashboard, Cpu, Truck, AlertTriangle, Sparkles, Factory } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { NavLink } from "@/components/NavLink";
 import {
@@ -18,6 +18,7 @@ const items = [
   { title: "Overview", url: "/", icon: LayoutDashboard },
   { title: "Components", url: "/components", icon: Cpu },
   { title: "Suppliers", url: "/suppliers", icon: Truck },
+  { title: "Production Planner", url: "/planner", icon: Factory },
   { title: "Risk Alerts", url: "/alerts", icon: AlertTriangle },
   { title: "AI Copilot", url: "/copilot", icon: Sparkles },
 ];
@@ -31,12 +32,12 @@ export function AppSidebar() {
     <Sidebar collapsible="icon" className="border-r">
       <SidebarHeader className="border-b border-sidebar-border">
         <div className="flex items-center gap-2 px-2 py-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
-            <span className="text-sm font-semibold">H</span>
+          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-accent text-accent-foreground">
+            <span className="font-display text-xs font-bold tracking-tight">CC</span>
           </div>
           {!collapsed && (
             <div className="flex flex-col leading-tight">
-              <span className="text-sm font-semibold tracking-tight">Helix</span>
+              <span className="font-display text-sm font-semibold tracking-tight">Component Compass</span>
               <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Supply Intelligence</span>
             </div>
           )}

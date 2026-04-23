@@ -9,13 +9,14 @@ const TITLES: Record<string, string> = {
   "/": "Overview",
   "/components": "Components",
   "/suppliers": "Suppliers",
+  "/planner": "Production Planner",
   "/alerts": "Risk Alerts",
   "/copilot": "AI Copilot",
 };
 
 export default function AppLayout() {
   const { pathname } = useLocation();
-  const title = TITLES[pathname] ?? "Helix";
+  const title = TITLES[pathname] ?? "Component Compass";
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-background">
@@ -24,7 +25,7 @@ export default function AppLayout() {
           <header className="sticky top-0 z-20 flex h-14 items-center gap-3 border-b bg-background/80 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <SidebarTrigger className="text-muted-foreground hover:text-foreground" />
             <div className="h-5 w-px bg-border" />
-            <h1 className="text-sm font-semibold tracking-tight">{title}</h1>
+            <h1 className="font-display text-sm font-semibold tracking-tight">{title}</h1>
             <div className="ml-auto flex items-center gap-2">
               <div className="relative hidden md:block">
                 <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />

@@ -1,11 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Sparkline } from "@/components/Sparkline";
 import { StatusDot } from "@/components/StatusDot";
-import { ArrowUpRight, RefreshCw, Sparkles } from "lucide-react";
+import { ArrowUpRight, RefreshCw, Sparkles, ShieldCheck } from "lucide-react";
 import {
+  components as allComponents,
   getKpis,
   inventoryValueTrend,
   topCritical,
@@ -17,17 +18,80 @@ import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "rec
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
 
-function KpiTile({ label, value, delta, spark }: { label: string; value: string; delta?: string; spark: number[] }) {
+type Tone = "neutral" | "rose" | "amber";
+
+const toneStyles: Record<Tone, { card: string; value: string; spark: string }> = {
+  neutral: { card: "", value: "text-foreground", spark: "hsl(var(--accent))" },
+  rose: {
+    card: "bg-rose-50/70 border-rose-100",
+    value: "text-rose-600",
+    spark: "hsl(350 75% 50%)",
+  },
+  amber: {
+    card: "bg-amber-50/70 border-amber-100",
+    value: "text-amber-700",
+    spark: "hsl(32 90% 45%)",
+  },
+};
+
+function KpiTile({ label, value, delta, spark, tone = "neutral" }: { label: string; value: string; delta?: string; spark: number[]; tone?: Tone }) {
+  const t = toneStyles[tone];
   return (
-    <Card className="p-5 shadow-sm transition-shadow hover:shadow">
+    <Card className={`p-5 shadow-sm transition-shadow hover:shadow ${t.card}`}>
       <div className="flex items-start justify-between">
         <div>
           <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{label}</p>
-          <p className="tabular mt-2 text-3xl font-semibold tracking-tight text-foreground">{value}</p>
+          <p className={`tabular font-display mt-2 text-3xl font-semibold tracking-tight ${t.value}`}>{value}</p>
           {delta && <p className="mt-1 text-xs text-muted-foreground">{delta}</p>}
         </div>
         <div className="h-10 w-24">
-          <Sparkline data={spark} />
+          <Sparkline data={spark} color={t.spark} />
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+function HealthHero() {
+  const { score, label, accentClass, dotClass, barClass } = useMemo(() => {
+    const avg = allComponents.reduce((s, c) => s + riskScore(c), 0) / allComponents.length;
+    const score = Math.max(0, Math.min(100, Math.round(100 - avg)));
+    if (score >= 80) {
+      return { score, label: "Healthy", accentClass: "text-emerald-600", dotClass: "bg-emerald-500", barClass: "bg-emerald-500" };
+    }
+    if (score >= 50) {
+      return { score, label: "Watch", accentClass: "text-amber-700", dotClass: "bg-amber-500", barClass: "bg-amber-500" };
+    }
+    return { score, label: "Critical", accentClass: "text-rose-600", dotClass: "bg-rose-500", barClass: "bg-rose-500" };
+  }, []);
+
+  return (
+    <Card className="p-6 shadow-sm md:p-8">
+      <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+        <div className="flex items-center gap-5">
+          <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-secondary">
+            <ShieldCheck className={`h-7 w-7 ${accentClass}`} />
+          </div>
+          <div>
+            <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Supply Health Score</p>
+            <div className="mt-1 flex items-baseline gap-3">
+              <span className={`tabular font-display text-5xl font-semibold tracking-tight ${accentClass}`}>{score}</span>
+              <span className="text-sm text-muted-foreground">/ 100</span>
+              <span className={`inline-flex items-center gap-1.5 rounded-full bg-secondary px-2.5 py-1 text-xs font-medium ${accentClass}`}>
+                <span className={`h-1.5 w-1.5 rounded-full ${dotClass}`} />
+                {label}
+              </span>
+            </div>
+            <p className="mt-1.5 text-xs text-muted-foreground">Composite of stock coverage, lead time, and sourcing concentration</p>
+          </div>
+        </div>
+        <div className="md:w-72">
+          <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
+            <div className="h-full bg-accent transition-all" style={{ width: `${score}%` }} />
+          </div>
+          <div className="mt-2 flex justify-between text-[10px] uppercase tracking-wider text-muted-foreground">
+            <span>Critical</span><span>Watch</span><span>Healthy</span>
+          </div>
         </div>
       </div>
     </Card>
@@ -107,11 +171,13 @@ export default function Overview() {
         <p className="mt-1 text-sm text-muted-foreground">Real-time view of your component supply chain.</p>
       </div>
 
+      <HealthHero />
+
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <KpiTile label="Total SKUs" value={kpis.total.toString()} delta="Tracked components" spark={trend.map((t) => t.value / 1000)} />
-        <KpiTile label="At Risk" value={kpis.atRisk.toString()} delta={`${Math.round((kpis.atRisk / kpis.total) * 100)}% of inventory`} spark={[8, 9, 10, 11, 10, 12, 13, 12, 14, 15, 14, 16]} />
-        <KpiTile label="Avg Lead Time" value={`${kpis.avgLead}w`} delta="Across all suppliers" spark={[10, 11, 11, 12, 12, 13, 13, 14, 14, 13, 14, 14]} />
-        <KpiTile label="Open Alerts" value={kpis.openAlerts.toString()} delta="Awaiting action" spark={[4, 5, 6, 6, 7, 7, 8, 9, 10, 11, 12, kpis.openAlerts]} />
+        <KpiTile tone="rose" label="At Risk" value={kpis.atRisk.toString()} delta={`${Math.round((kpis.atRisk / kpis.total) * 100)}% of inventory`} spark={[8, 9, 10, 11, 10, 12, 13, 12, 14, 15, 14, 16]} />
+        <KpiTile tone="amber" label="Avg Lead Time" value={`${kpis.avgLead}w`} delta="Across all suppliers" spark={[10, 11, 11, 12, 12, 13, 13, 14, 14, 13, 14, 14]} />
+        <KpiTile tone="rose" label="Open Alerts" value={kpis.openAlerts.toString()} delta="Awaiting action" spark={[4, 5, 6, 6, 7, 7, 8, 9, 10, 11, 12, kpis.openAlerts]} />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">
