@@ -87,7 +87,7 @@ function HealthHero() {
         </div>
         <div className="md:w-72">
           <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
-            <div className={`h-full ${barClass} transition-all`} style={{ width: `${score}%` }} />
+            <div className="h-full bg-accent transition-all" style={{ width: `${score}%` }} />
           </div>
           <div className="mt-2 flex justify-between text-[10px] uppercase tracking-wider text-muted-foreground">
             <span>Critical</span><span>Watch</span><span>Healthy</span>
