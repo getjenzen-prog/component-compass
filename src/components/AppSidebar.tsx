@@ -32,11 +32,11 @@ export function AppSidebar() {
       <SidebarHeader className="border-b border-sidebar-border">
         <div className="flex items-center gap-2 px-2 py-3">
           <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
-            <span className="text-sm font-semibold">H</span>
+            <span className="text-sm font-semibold">C</span>
           </div>
           {!collapsed && (
             <div className="flex flex-col leading-tight">
-              <span className="text-sm font-semibold tracking-tight">Helix</span>
+              <span className="text-sm font-semibold tracking-tight">Component Compass</span>
               <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Supply Intelligence</span>
             </div>
           )}
