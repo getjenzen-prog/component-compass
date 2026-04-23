@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Sparkline } from "@/components/Sparkline";
 import { StatusDot } from "@/components/StatusDot";
-import { ArrowUpRight, RefreshCw, Sparkles, ShieldCheck } from "lucide-react";
+import { ArrowUpRight, RefreshCw, Sparkles, ShieldCheck, ChevronRight } from "lucide-react";
 import {
   components as allComponents,
   getKpis,
@@ -111,7 +111,7 @@ export default function Overview() {
     setSummary("");
     try {
       const top = critical.map((c) => `${c.mpn} (${c.manufacturer}) — ${weeksOfSupply(c)}w supply, ${c.leadTimeWeeks}w lead, ${c.supplierIds.length} supplier(s), risk ${riskScore(c)}`).join("\n");
-      const prompt = `KPIs: ${kpis.total} SKUs, ${kpis.atRisk} at risk, avg lead time ${kpis.avgLead} weeks, ${kpis.openAlerts} open alerts.\n\nTop critical components:\n${top}\n\nWrite a 3-sentence executive briefing for a hardware ops lead. Focus on the biggest immediate risks and one recommended action. Plain prose, no bullets.`;
+      const prompt = `KPIs: ${kpis.total} SKUs, ${kpis.atRisk} at risk, avg lead time ${kpis.avgLead} weeks, ${kpis.openAlerts} open alerts.\n\nTop critical components:\n${top}\n\nWrite an executive briefing for a hardware ops lead as exactly 3 short lines, each one sentence (max ~20 words). Format strictly as:\nCRITICAL: <biggest immediate risk>\nWARNING: <secondary concern to watch>\nACTION: <one recommended next step>\nNo other text, no bullets, no markdown.`;
 
       const resp = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-chat`, {
         method: "POST",
@@ -221,9 +221,13 @@ export default function Overview() {
               <RefreshCw className={`h-3.5 w-3.5 ${loadingSummary ? "animate-spin" : ""}`} />
             </Button>
           </div>
-          <p className="min-h-[8rem] flex-1 text-sm leading-relaxed text-foreground/85">
-            {summary || (loadingSummary ? "Analyzing your supply chain…" : "—")}
-          </p>
+          <div className="min-h-[8rem] flex-1 text-sm leading-relaxed text-foreground/85">
+            {summary ? (
+              <BriefingPoints text={summary} />
+            ) : (
+              <p>{loadingSummary ? "Analyzing your supply chain…" : "—"}</p>
+            )}
+          </div>
           <Link to="/copilot" className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-accent hover:underline">
             Ask follow-up <ArrowUpRight className="h-3 w-3" />
           </Link>
