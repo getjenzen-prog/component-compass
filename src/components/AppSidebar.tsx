@@ -32,7 +32,7 @@ export function AppSidebar() {
       <SidebarHeader className="border-b border-sidebar-border">
         <div className="flex items-center gap-2 px-2 py-3">
           <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
-            <span className="text-sm font-semibold">C</span>
+            <span className="text-xs font-semibold tracking-tight">CC</span>
           </div>
           {!collapsed && (
             <div className="flex flex-col leading-tight">
