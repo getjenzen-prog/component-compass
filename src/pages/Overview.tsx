@@ -98,6 +98,39 @@ function HealthHero() {
   );
 }
 
+function BriefingPoints({ text }: { text: string }) {
+  const lines = text
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean);
+
+  const parsed = lines.map((line) => {
+    const match = line.match(/^(CRITICAL|WARNING|ACTION)\s*[:\-—]\s*(.+)$/i);
+    if (match) {
+      return { kind: match[1].toUpperCase() as "CRITICAL" | "WARNING" | "ACTION", body: match[2] };
+    }
+    return { kind: "INFO" as const, body: line };
+  });
+
+  const renderPrefix = (kind: string) => {
+    if (kind === "CRITICAL") return <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-rose-500" aria-hidden />;
+    if (kind === "WARNING") return <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-amber-500" aria-hidden />;
+    if (kind === "ACTION") return <ChevronRight className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden />;
+    return <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-muted-foreground/40" aria-hidden />;
+  };
+
+  return (
+    <ul className="divide-y divide-border">
+      {parsed.map((p, i) => (
+        <li key={i} className="flex items-start gap-2.5 py-2 first:pt-0 last:pb-0">
+          {renderPrefix(p.kind)}
+          <span className="leading-relaxed">{p.body}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export default function Overview() {
   const kpis = getKpis();
   const trend = inventoryValueTrend();
