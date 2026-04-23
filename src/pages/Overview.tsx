@@ -21,7 +21,7 @@ import { Link } from "react-router-dom";
 type Tone = "neutral" | "rose" | "amber";
 
 const toneStyles: Record<Tone, { card: string; value: string; spark: string }> = {
-  neutral: { card: "", value: "text-foreground", spark: "hsl(var(--primary))" },
+  neutral: { card: "", value: "text-foreground", spark: "hsl(var(--accent))" },
   rose: {
     card: "bg-rose-50/70 border-rose-100",
     value: "text-rose-600",
@@ -41,7 +41,7 @@ function KpiTile({ label, value, delta, spark, tone = "neutral" }: { label: stri
       <div className="flex items-start justify-between">
         <div>
           <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{label}</p>
-          <p className={`tabular mt-2 text-3xl font-semibold tracking-tight ${t.value}`}>{value}</p>
+          <p className={`tabular font-display mt-2 text-3xl font-semibold tracking-tight ${t.value}`}>{value}</p>
           {delta && <p className="mt-1 text-xs text-muted-foreground">{delta}</p>}
         </div>
         <div className="h-10 w-24">
@@ -75,7 +75,7 @@ function HealthHero() {
           <div>
             <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Supply Health Score</p>
             <div className="mt-1 flex items-baseline gap-3">
-              <span className={`tabular text-5xl font-semibold tracking-tight ${accentClass}`}>{score}</span>
+              <span className={`tabular font-display text-5xl font-semibold tracking-tight ${accentClass}`}>{score}</span>
               <span className="text-sm text-muted-foreground">/ 100</span>
               <span className={`inline-flex items-center gap-1.5 rounded-full bg-secondary px-2.5 py-1 text-xs font-medium ${accentClass}`}>
                 <span className={`h-1.5 w-1.5 rounded-full ${dotClass}`} />
@@ -87,7 +87,7 @@ function HealthHero() {
         </div>
         <div className="md:w-72">
           <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
-            <div className={`h-full ${barClass} transition-all`} style={{ width: `${score}%` }} />
+            <div className="h-full bg-accent transition-all" style={{ width: `${score}%` }} />
           </div>
           <div className="mt-2 flex justify-between text-[10px] uppercase tracking-wider text-muted-foreground">
             <span>Critical</span><span>Watch</span><span>Healthy</span>
