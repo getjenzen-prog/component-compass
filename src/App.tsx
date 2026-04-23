@@ -9,6 +9,7 @@ import Components from "./pages/Components";
 import Suppliers from "./pages/Suppliers";
 import Alerts from "./pages/Alerts";
 import Copilot from "./pages/Copilot";
+import Planner from "./pages/Planner";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ const App = () => (
             <Route path="/components" element={<Components />} />
             <Route path="/suppliers" element={<Suppliers />} />
             <Route path="/alerts" element={<Alerts />} />
+            <Route path="/planner" element={<Planner />} />
             <Route path="/copilot" element={<Copilot />} />
           </Route>
           <Route path="*" element={<NotFound />} />
